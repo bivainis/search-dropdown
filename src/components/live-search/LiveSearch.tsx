@@ -91,21 +91,29 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
 
       {dropdownIsOpen && !loading && data.length > 0 && (
         <ul className={styles.dropdownList}>
-          {data.map(({ id, attributes }) => {
-            return (
-              <li key={id}>
-                {attributes.avatar !== null && (
-                  <img
-                    src={attributes.avatar}
-                    alt={`${attributes.firstName} ${attributes.lastName} avatar image`}
-                  />
-                )}
-                {attributes.firstName} {attributes.lastName}
-                <br />
-                {/* @TODO: email */}
-              </li>
-            );
-          })}
+          {data
+            .filter((item) => {
+              // test if string has search query, case insensitive
+              const regexp = new RegExp(searchQuery, 'i');
+              return regexp.test(
+                item.attributes.firstName + item.attributes.lastName
+              );
+            })
+            .map(({ id, attributes }) => {
+              return (
+                <li key={id}>
+                  {attributes.avatar !== null && (
+                    <img
+                      src={attributes.avatar}
+                      alt={`${attributes.firstName} ${attributes.lastName} avatar image`}
+                    />
+                  )}
+                  {attributes.firstName} {attributes.lastName}
+                  <br />
+                  {/* @TODO: email */}
+                </li>
+              );
+            })}
         </ul>
       )}
     </div>
