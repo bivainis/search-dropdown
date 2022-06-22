@@ -130,7 +130,9 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
 
       case 'Enter':
         if (selectedItemIndex !== null) {
-          setSearchQuery(data[selectedItemIndex].attributes.firstName);
+          const { firstName, lastName } = data[selectedItemIndex].attributes;
+
+          setSearchQuery(firstName + ' ' + lastName);
           setDropdownIsOpen(false);
         }
 

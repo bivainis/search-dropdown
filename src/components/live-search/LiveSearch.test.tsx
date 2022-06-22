@@ -195,6 +195,23 @@ test('esc key should clear the input', () => {
   expect(inputElement).not.toHaveValue();
 });
 
-test('when input is focused, Tab should focus the first item in the list', () => {});
-test('when first item is focused, ArrowUp should focus back on input', () => {});
-test('empty state is shown if nothing matches search query', () => {});
+test('enter key should set input value and close the dropdown', async () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('listbox');
+
+  userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+  expect(inputElement).toHaveValue('Harriet Banks');
+  expect(inputElement).not.toHaveFocus();
+  expect(list).not.toBeInTheDocument();
+});
+
+// @TODO:
+xtest('arrow navigation works on filtered list', () => {});
+xtest('when input is focused, Tab should focus the first item in the list', () => {});
+xtest('when first item is focused, ArrowUp should focus back on input', () => {});
+xtest('empty state is shown if nothing matches search query', () => {});
+xtest('hitting esc on an empty input should close the dropdown', () => {});
