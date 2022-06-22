@@ -1,5 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import ClickOutside from '../../helpers/test-helpers';
 import LiveSearch from './LiveSearch';
 
 beforeEach(() => {
@@ -94,12 +95,7 @@ test('filter dropdown based on a query', async () => {
 });
 
 test('preserve query on input focus loss', async () => {
-  // render a helper component to test input blur
-  function Test() {
-    return <div data-testid="click-outside">Test</div>;
-  }
-
-  render(<Test />);
+  render(<ClickOutside />);
 
   const inputElement = screen.getByRole('textbox');
   const clickOutsideElement = screen.getByTestId('click-outside');
@@ -123,6 +119,23 @@ test('preserve query on input focus loss', async () => {
 
   expect(items.length).toBeGreaterThan(1);
   expect(inputElement).toHaveValue('harr');
+});
+
+test('dropdown is closed when clicking outside', async () => {
+  render(<ClickOutside />);
+
+  const inputElement = screen.getByRole('textbox');
+  const clickOutsideElement = screen.getByTestId('click-outside');
+
+  userEvent.click(inputElement);
+  expect(inputElement).toHaveFocus();
+
+  const list = await screen.findByRole('listbox');
+  expect(list).toBeInTheDocument();
+
+  userEvent.click(clickOutsideElement);
+
+  expect(list).not.toBeInTheDocument();
 });
 
 test('dropdown is hidden after selecting an option', async () => {

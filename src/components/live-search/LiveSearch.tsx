@@ -70,13 +70,16 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const [error, setError] = useState<Error>();
   const [data, setData] = useState<Employee[]>([]);
   const ulRef = useRef<HTMLUListElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // @TODO: debounce
     setSearchQuery(e.target.value);
   };
 
-  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputFocus = (
+    e: React.FocusEvent<HTMLInputElement | HTMLUListElement>
+  ) => {
     setDropdownIsOpen(true);
   };
 
@@ -204,8 +207,26 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
     }
   }, [ulRef, selectedItemIndex, dropdownIsOpen]);
 
+  useEffect(() => {
+    const handleWindowClick = (e: MouseEvent) => {
+      if (!wrapperRef.current?.contains(e.target as HTMLElement)) {
+        setDropdownIsOpen(false);
+      }
+    };
+
+    if (dropdownIsOpen) {
+      window.addEventListener('click', handleWindowClick);
+    } else {
+      window.removeEventListener('click', handleWindowClick);
+    }
+
+    return () => {
+      window.removeEventListener('click', handleWindowClick);
+    };
+  }, [wrapperRef, dropdownIsOpen]);
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={wrapperRef}>
       <input
         aria-label="Manager search"
         className={styles.input}
@@ -215,7 +236,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         value={searchQuery}
         onChange={handleInputChange}
         onFocus={handleInputFocus}
-        onBlur={handleInputFocus}
         onKeyDown={handleKeyDown}
       />
 
