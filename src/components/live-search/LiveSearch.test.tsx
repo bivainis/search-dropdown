@@ -125,6 +125,21 @@ test('preserve query on input focus loss', async () => {
   expect(inputElement).toHaveValue('harr');
 });
 
+test('dropdown is hidden after selecting an option', async () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('listbox');
+
+  const { getAllByRole } = within(list);
+  const items = getAllByRole('option');
+
+  userEvent.click(items[1]);
+
+  expect(list).not.toBeInTheDocument();
+});
+
 test('when input is focused, ArrowDown should focus the first item in the list', async () => {
   const inputElement = screen.getByRole('textbox');
 
@@ -140,8 +155,37 @@ test('when input is focused, ArrowDown should focus the first item in the list',
   expect(items[0]).toHaveAttribute('aria-selected', 'true');
 });
 
-test('when first item is focused, ArrowDown should focus the next item in the list', () => {});
-test('when first item is focused, ArrowUp should focus back on input', () => {});
+test('when first item is focused, ArrowDown should focus the next item in the list', async () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('listbox');
+
+  userEvent.keyboard('{ArrowDown}{ArrowDown}');
+
+  const { getAllByRole } = within(list);
+  const items = getAllByRole('option');
+
+  expect(items[1]).toHaveAttribute('aria-selected', 'true');
+  expect(items[1]).toHaveFocus();
+});
+
+test('clicking on an option should fill the full name in the input and hide the list', async () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('listbox');
+  const { getAllByRole } = within(list);
+  const items = getAllByRole('option');
+
+  userEvent.click(items[2]);
+
+  expect(inputElement).toHaveValue('Mathilda Summers');
+});
+
 test('when input is focused, Tab should focus the first item in the list', () => {});
+test('when first item is focused, ArrowUp should focus back on input', () => {});
 test('esc key should clear the input', () => {});
 test('empty state is shown if nothing matches search query', () => {});

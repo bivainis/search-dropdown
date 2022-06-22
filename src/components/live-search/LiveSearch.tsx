@@ -141,7 +141,11 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
     }
   };
 
-  const handleOptionSelect = (id: number) => {};
+  const handleOptionSelect = (index: number, value: string) => {
+    setSelectedItemIndex(index);
+    setSearchQuery(value);
+    setDropdownIsOpen(false);
+  };
 
   const focusListItem = (
     ref: React.RefObject<HTMLUListElement>,
@@ -240,7 +244,12 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                   key={id}
                   role="option"
                   tabIndex={-1}
-                  onClick={() => handleOptionSelect(id)}
+                  onClick={() =>
+                    handleOptionSelect(
+                      index,
+                      attributes.firstName + ' ' + attributes.lastName
+                    )
+                  }
                   aria-selected={selectedItemIndex === index}
                   aria-label={attributes.firstName + ' ' + attributes.lastName}
                 >
