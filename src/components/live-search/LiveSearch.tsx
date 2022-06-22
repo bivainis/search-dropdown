@@ -49,6 +49,7 @@ interface Relationship {
  * - documentation and sources
  * - lock node version
  * - api url env variable
+ * - (maybe) abstract css values to css variables, add scss
  * - (maybe) cache results and compare when rendering
  * - (maybe) look into suspense
  * - (maybe) paginate
@@ -147,7 +148,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                     }
                   />
                   <div>
-                    <strong className={styles.name}>
+                    <strong className={styles.name} data-testid="full-name">
                       {attributes.firstName} {attributes.lastName}
                     </strong>
                     {email}
