@@ -223,9 +223,14 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
             .filter((item) => {
               // test if string has search query, case insensitive
               const regexp = new RegExp(searchQuery, 'i');
-              return regexp.test(
+              const variant1 = regexp.test(
                 item.attributes.firstName + item.attributes.lastName
               );
+              const variant2 = regexp.test(
+                item.attributes.firstName + ' ' + item.attributes.lastName
+              );
+
+              return variant1 || variant2;
             })
             .map(({ id, attributes, email, rgbColorArray }, index) => {
               return (

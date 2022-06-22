@@ -61,7 +61,7 @@ test('filter dropdown based on a query', async () => {
       expectedText: 'Harriet Banks',
     },
     combined: {
-      searchQueries: ['etmc', 'etMc', 'ETmc'],
+      searchQueries: ['etmc', 'etMc', 'ETmc', 'Harriet McKinney'],
       expectedLength: 1,
       expectedText: 'Harriet McKinney',
     },
