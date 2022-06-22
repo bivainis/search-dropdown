@@ -1,5 +1,5 @@
-import generateRandomRgbColor from './random-rgb';
+import generateRandomRgbValueArray from './random-rgb';
 
 test('returns color array', () => {
-  expect(generateRandomRgbColor()).toHaveLength(3);
+  expect(generateRandomRgbValueArray()).toHaveLength(3);
 });

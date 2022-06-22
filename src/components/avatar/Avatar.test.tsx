@@ -2,7 +2,13 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import Avatar from './Avatar';
 
 beforeEach(() => {
-  render(<Avatar initials="AB" altText="Alice Bob avatar image" />);
+  render(
+    <Avatar
+      initials="AB"
+      altText="Alice Bob avatar image"
+      rgbColorArray={[100, 200, 50]}
+    />
+  );
 });
 
 afterEach(() => {

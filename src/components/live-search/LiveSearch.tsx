@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { API_URL } from '../../urls';
+import generateRandomRgbValueArray from '../../util/random-rgb';
 import { Avatar } from '../avatar';
 import styles from './LiveSearch.module.css';
 
@@ -15,6 +16,7 @@ interface Employee {
     lastName: string;
   };
   email: string;
+  rgbColorArray: [number, number, number];
   relationships: {
     account: {
       data: {
@@ -62,6 +64,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const [data, setData] = useState<Employee[]>([]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // @TODO: debounce
     setSearchQuery(e.target.value);
   };
 
@@ -87,6 +90,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
             return {
               ...item,
               email,
+              rgbColorArray: generateRandomRgbValueArray(),
             };
           })
         );
@@ -130,12 +134,13 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                 item.attributes.firstName + item.attributes.lastName
               );
             })
-            .map(({ id, attributes, email }) => {
+            .map(({ id, attributes, email, rgbColorArray }) => {
               return (
                 <li className={styles.listItem} key={id}>
                   <Avatar
                     src={attributes.avatar}
                     altText={`${attributes.firstName} ${attributes.lastName} avatar image`}
+                    rgbColorArray={rgbColorArray}
                     initials={
                       attributes.firstName.charAt(0) +
                       attributes.lastName.charAt(0)

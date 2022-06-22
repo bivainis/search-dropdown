@@ -1,20 +1,23 @@
-import generateRandomRgbColor from '../../util/random-rgb';
+import generateRandomRgbValueArray from '../../util/random-rgb';
 import styles from './Avatar.module.css';
+
+type RgbArray = [number, number, number];
 
 interface AvatarProps {
   altText: string;
   src?: string;
   initials?: string;
+  rgbColorArray: RgbArray;
 }
 
-const Avatar = ({ src, altText, initials }: AvatarProps) => {
+const Avatar = ({ src, altText, initials, rgbColorArray }: AvatarProps) => {
   if (!src) {
     return (
       <div
         role="img"
         aria-label={altText}
         className={styles.avatar}
-        style={{ background: `rgb(${generateRandomRgbColor()})` }}
+        style={{ background: `rgb(${rgbColorArray})` }}
       >
         {initials}
       </div>
