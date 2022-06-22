@@ -14,6 +14,22 @@ interface Employee {
     firstName: string;
     lastName: string;
   };
+  email: string;
+  relationships: {
+    account: {
+      data: {
+        id: number;
+      };
+    };
+  };
+}
+
+interface Relationship {
+  type: string;
+  id: number;
+  attributes: {
+    email: string;
+  };
 }
 
 /**
@@ -61,7 +77,19 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         const res = await fetch(API_URL);
         const json = await res.json();
 
-        setData(json.data);
+        setData(
+          json.data.map((item: Employee) => {
+            const relationship = json.included.find((i: Relationship) => {
+              return i.id === item.relationships.account.data.id;
+            });
+            const email = relationship.attributes.email;
+
+            return {
+              ...item,
+              email,
+            };
+          })
+        );
       } catch (error) {
         if (error instanceof Error) {
           setError(error);
@@ -102,7 +130,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                 item.attributes.firstName + item.attributes.lastName
               );
             })
-            .map(({ id, attributes }) => {
+            .map(({ id, attributes, email }) => {
               return (
                 <li className={styles.listItem} key={id}>
                   <Avatar
@@ -114,11 +142,10 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                     }
                   />
                   <div>
-                    <strong>
+                    <strong className={styles.name}>
                       {attributes.firstName} {attributes.lastName}
                     </strong>
-                    <br />
-                    {/* @TODO: email */}email@example.com
+                    {email}
                   </div>
                 </li>
               );
