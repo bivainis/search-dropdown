@@ -51,3 +51,9 @@ Since we need to search ignoring the space between first and last names, filteri
 Because we want the dropdown to represent a role closer to select than a list, listbox and option roles might be used.
 
 Controling list height would ideally be done by calculating the height of one list item and cap the height accordingly, however initially we'll limit it by fixed element height until it can be refactored.
+
+In addition, adding some extra max-height, to indicate to the users there are more items in the list that they can scroll to.
+
+### Keyboard navigation
+
+Following best practice guide from here: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role#required_javascript_features

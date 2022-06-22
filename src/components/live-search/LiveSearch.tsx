@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { API_URL } from '../../urls';
 import generateRandomRgbValueArray from '../../util/random-rgb';
 import { Avatar } from '../avatar';
@@ -44,6 +44,9 @@ interface Relationship {
  * - aria roles: listbox > option: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
  * - esc should clear the field
  * - keyboard navigation
+ * - empty state on empty data or empty search results
+ * - loading and error states
+ * - ul component should accept data
  * - debounce
  * - styling
  * - documentation and sources
@@ -60,17 +63,95 @@ interface Relationship {
 const LiveSearch = ({ id }: LiveSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [data, setData] = useState<Employee[]>([]);
+  const ulRef = useRef<HTMLUListElement>(null);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // @TODO: debounce
     setSearchQuery(e.target.value);
   };
 
-  const handleInputFocus = () => {
-    setDropdownIsOpen((current) => !current);
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setDropdownIsOpen(true);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLUListElement>
+  ) => {
+    switch (e.key) {
+      case 'Tab':
+        setSelectedItemIndex(0);
+
+        break;
+
+      case 'ArrowDown':
+        /**
+         * preventDefault fixes an issue where the first item is
+         *   out of the dropdown scroll view on ArrowDown (probably arrow
+         *   down starts to already scroll the list before we kick in the
+         *   focus on an item). Disables scrolling on initial render when
+         *   no item is selected yet.
+         */
+        if (selectedItemIndex === null) {
+          e.preventDefault();
+        }
+
+        setSelectedItemIndex((prev) => {
+          if (prev === null) {
+            return 0;
+          }
+
+          if (prev < data.length) {
+            return prev + 1;
+          }
+
+          return prev;
+        });
+
+        break;
+      case 'ArrowUp':
+        setSelectedItemIndex((prev) => {
+          if (prev === null) {
+            return prev;
+          }
+          if (prev > 0) {
+            return prev - 1;
+          }
+
+          return prev;
+        });
+
+        break;
+
+      case 'Enter':
+        if (selectedItemIndex !== null) {
+          setSearchQuery(data[selectedItemIndex].attributes.firstName);
+          setDropdownIsOpen(false);
+        }
+
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleOptionSelect = (id: number) => {};
+
+  const focusListItem = (
+    ref: React.RefObject<HTMLUListElement>,
+    index: number
+  ) => {
+    if (ref.current?.children[index]) {
+      const itemAtIndex = ref.current?.children[index] as HTMLElement;
+
+      itemAtIndex.focus();
+    }
   };
 
   useEffect(() => {
@@ -107,6 +188,12 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
     fetchEmployees();
   }, []);
 
+  useEffect(() => {
+    if (dropdownIsOpen && selectedItemIndex !== null) {
+      focusListItem(ulRef, selectedItemIndex);
+    }
+  }, [ulRef, selectedItemIndex, dropdownIsOpen]);
+
   return (
     <div className={styles.container}>
       <input
@@ -119,14 +206,19 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         onChange={handleInputChange}
         onFocus={handleInputFocus}
         onBlur={handleInputFocus}
+        onKeyDown={handleKeyDown}
       />
 
-      {loading && <p>Loading...</p>}
-
-      {error && <p>An error occurred</p>}
-
       {dropdownIsOpen && !loading && data.length > 0 && (
-        <ul className={styles.dropdownList}>
+        <ul
+          className={styles.dropdownList}
+          role="listbox"
+          tabIndex={0}
+          ref={ulRef}
+          aria-label="Manager search listbox"
+          aria-activedescendant={`option-${selectedItemIndex || 0}`}
+          onKeyDown={handleKeyDown}
+        >
           {data
             .filter((item) => {
               // test if string has search query, case insensitive
@@ -135,9 +227,18 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
                 item.attributes.firstName + item.attributes.lastName
               );
             })
-            .map(({ id, attributes, email, rgbColorArray }) => {
+            .map(({ id, attributes, email, rgbColorArray }, index) => {
               return (
-                <li className={styles.listItem} key={id}>
+                <li
+                  className={styles.listItem}
+                  id={`option-${index}`}
+                  key={id}
+                  role="option"
+                  tabIndex={-1}
+                  onClick={() => handleOptionSelect(id)}
+                  aria-selected={selectedItemIndex === index}
+                  aria-label={attributes.firstName + ' ' + attributes.lastName}
+                >
                   <Avatar
                     src={attributes.avatar}
                     altText={`${attributes.firstName} ${attributes.lastName} avatar image`}

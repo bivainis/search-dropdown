@@ -23,7 +23,7 @@ test('User can focus on the input field', () => {
 });
 
 test('Dropdown is hidden on initial render', () => {
-  const dropdownElementOrNull = screen.queryByRole('list');
+  const dropdownElementOrNull = screen.queryByRole('listbox');
 
   expect(dropdownElementOrNull).not.toBeInTheDocument();
 });
@@ -33,12 +33,12 @@ test('When user clicks into the input field, he/she sees the full list of manage
 
   userEvent.click(inputElement);
 
-  const list = await screen.findByRole('list');
+  const list = await screen.findByRole('listbox');
 
   expect(list).toBeInTheDocument();
 
   const { getAllByRole } = within(list);
-  const items = getAllByRole('listitem');
+  const items = getAllByRole('option');
 
   expect(items.length).toBeGreaterThan(1);
 });
@@ -75,7 +75,7 @@ test('filter dropdown based on a query', async () => {
       userEvent.click(inputElement);
       userEvent.type(inputElement, searchQuery);
 
-      const list = await screen.findByRole('list');
+      const list = await screen.findByRole('listbox');
       const { findAllByTestId } = within(list);
       const filtered = await findAllByTestId('full-name');
 
@@ -115,12 +115,33 @@ test('preserve query on input focus loss', async () => {
 
   userEvent.click(inputElement);
 
-  const list = await screen.findByRole('list');
+  const list = await screen.findByRole('listbox');
   expect(list).toBeInTheDocument();
 
   const { getAllByRole } = within(list);
-  const items = getAllByRole('listitem');
+  const items = getAllByRole('option');
 
   expect(items.length).toBeGreaterThan(1);
   expect(inputElement).toHaveValue('harr');
 });
+
+test('when input is focused, ArrowDown should focus the first item in the list', async () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('listbox');
+
+  userEvent.keyboard('{ArrowDown}');
+
+  const { getAllByRole } = within(list);
+  const items = getAllByRole('option');
+
+  expect(items[0]).toHaveAttribute('aria-selected', 'true');
+});
+
+test('when first item is focused, ArrowDown should focus the next item in the list', () => {});
+test('when first item is focused, ArrowUp should focus back on input', () => {});
+test('when input is focused, Tab should focus the first item in the list', () => {});
+test('esc key should clear the input', () => {});
+test('empty state is shown if nothing matches search query', () => {});

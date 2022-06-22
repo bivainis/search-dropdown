@@ -19,7 +19,8 @@
   border-bottom: 1px solid silver;
 }
 
-.listItem:hover {
+.listItem:hover,
+.listItem:focus {
   background-color: rgba(123, 200, 123, 0.1);
 }
 
