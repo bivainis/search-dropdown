@@ -45,3 +45,9 @@ Will assign a random color during data mapping, so the colors don't change on re
 ### Filtering
 
 Since we need to search ignoring the space between first and last names, filtering could be done either by combining firstName + lastName and testing againts a regexp, or tested on the name field by ignoring the space.
+
+### Dropdown list
+
+Because we want the dropdown to represent a role closer to select than a list, listbox and option roles might be used.
+
+Controling list height would ideally be done by calculating the height of one list item and cap the height accordingly, however initially we'll limit it by fixed element height until it can be refactored.

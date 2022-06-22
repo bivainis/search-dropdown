@@ -1,11 +1,11 @@
-.container {
-}
-
 .dropdownList {
   list-style-type: none;
   padding: 0;
   margin: 0;
   border: 1px solid silver;
+  overflow: scroll;
+  box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.3);
+  max-height: 124px;
 }
 
 .listItem {
@@ -23,9 +23,6 @@
   background-color: rgba(123, 200, 123, 0.1);
 }
 
-.listItem:first-of-type {
-}
-
 .name {
   display: block;
 }
@@ -36,4 +33,9 @@
   border: 1px solid silver;
   width: 100%;
   margin-bottom: 4px;
+}
+
+.input:focus {
+  box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.3);
+  outline: none;
 }
