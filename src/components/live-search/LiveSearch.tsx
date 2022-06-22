@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { API_URL } from '../../urls';
+import { Avatar } from '../avatar';
 import styles from './LiveSearch.module.css';
 
 interface LiveSearchProps {
@@ -20,6 +21,8 @@ interface Employee {
  * - tests
  * - test utils
  * - abstract fetching to a hook
+ * - add arrow to input to indicate it's a dropdown
+ * - split into components
  * - aria roles: listbox > option: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
  * - esc should clear the field
  * - keyboard navigation
@@ -73,12 +76,12 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
 
   return (
     <div className={styles.container}>
-      <label htmlFor={id}>Manager search</label>
-
       <input
+        aria-label="Manager search"
         className={styles.input}
         id={id}
         type="text"
+        placeholder="Choose Manager"
         value={searchQuery}
         onChange={handleInputChange}
         onFocus={handleInputFocus}
@@ -101,16 +104,22 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
             })
             .map(({ id, attributes }) => {
               return (
-                <li key={id}>
-                  {attributes.avatar !== null && (
-                    <img
-                      src={attributes.avatar}
-                      alt={`${attributes.firstName} ${attributes.lastName} avatar image`}
-                    />
-                  )}
-                  {attributes.firstName} {attributes.lastName}
-                  <br />
-                  {/* @TODO: email */}
+                <li className={styles.listItem} key={id}>
+                  <Avatar
+                    src={attributes.avatar}
+                    altText={`${attributes.firstName} ${attributes.lastName} avatar image`}
+                    initials={
+                      attributes.firstName.charAt(0) +
+                      attributes.lastName.charAt(0)
+                    }
+                  />
+                  <div>
+                    <strong>
+                      {attributes.firstName} {attributes.lastName}
+                    </strong>
+                    <br />
+                    {/* @TODO: email */}email@example.com
+                  </div>
                 </li>
               );
             })}
