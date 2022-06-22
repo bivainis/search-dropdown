@@ -92,3 +92,35 @@ test('filter dropdown based on a query', async () => {
     }
   }
 });
+
+test('preserve query on input focus loss', async () => {
+  // render a helper component to test input blur
+  function Test() {
+    return <div data-testid="click-outside">Test</div>;
+  }
+
+  render(<Test />);
+
+  const inputElement = screen.getByRole('textbox');
+  const clickOutsideElement = screen.getByTestId('click-outside');
+
+  userEvent.click(inputElement);
+
+  expect(inputElement).toHaveFocus();
+
+  userEvent.type(inputElement, 'harr');
+  userEvent.click(clickOutsideElement);
+
+  expect(inputElement).not.toHaveFocus();
+
+  userEvent.click(inputElement);
+
+  const list = await screen.findByRole('list');
+  expect(list).toBeInTheDocument();
+
+  const { getAllByRole } = within(list);
+  const items = getAllByRole('listitem');
+
+  expect(items.length).toBeGreaterThan(1);
+  expect(inputElement).toHaveValue('harr');
+});
