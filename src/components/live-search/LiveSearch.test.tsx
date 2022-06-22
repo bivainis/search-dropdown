@@ -185,7 +185,16 @@ test('clicking on an option should fill the full name in the input and hide the 
   expect(inputElement).toHaveValue('Mathilda Summers');
 });
 
+test('esc key should clear the input', () => {
+  const inputElement = screen.getByRole('textbox');
+
+  userEvent.type(inputElement, 'Hello');
+
+  userEvent.keyboard('{Escape}');
+
+  expect(inputElement).not.toHaveValue();
+});
+
 test('when input is focused, Tab should focus the first item in the list', () => {});
 test('when first item is focused, ArrowUp should focus back on input', () => {});
-test('esc key should clear the input', () => {});
 test('empty state is shown if nothing matches search query', () => {});

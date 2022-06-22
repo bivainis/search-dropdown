@@ -136,6 +136,10 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
 
         break;
 
+      case 'Escape':
+        setSearchQuery('');
+        break;
+
       default:
         break;
     }
