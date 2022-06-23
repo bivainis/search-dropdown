@@ -1,4 +1,3 @@
-import generateRandomRgbValueArray from '../../util/random-rgb';
 import styles from './Avatar.module.css';
 
 type RgbArray = [number, number, number];

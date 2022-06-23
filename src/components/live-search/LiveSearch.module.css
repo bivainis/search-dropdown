@@ -8,26 +8,6 @@
   max-height: 150px;
 }
 
-.listItem {
-  display: flex;
-  cursor: pointer;
-  padding: 15px 20px;
-  font-size: 0.8rem;
-}
-
-.listItem:not(:last-of-type) {
-  border-bottom: 1px solid silver;
-}
-
-.listItem:hover,
-.listItem:focus {
-  background-color: rgba(123, 200, 123, 0.1);
-}
-
-.name {
-  display: block;
-}
-
 .input {
   padding: 10px;
   border-radius: 4px;

@@ -4,6 +4,7 @@ export interface Employee {
     avatar: string;
     firstName: string;
     lastName: string;
+    name: string;
   };
   email: string;
   rgbColorArray: [number, number, number];

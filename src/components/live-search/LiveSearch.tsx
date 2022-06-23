@@ -3,6 +3,9 @@ import useClickOutside from '../../hooks/useClickOutside';
 import useFetchData from '../../hooks/useFetchData';
 import { Employee } from '../../interfaces/interfaces';
 import { Avatar } from '../avatar';
+import ListBox from './ListBox';
+import Option from './Option';
+
 import styles from './LiveSearch.module.css';
 
 interface LiveSearchProps {
@@ -91,10 +94,10 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         break;
       case 'Enter':
         if (selectedItemIndex !== null) {
-          const { firstName, lastName } =
+          const { name } =
             data.filter(searchFilter)[selectedItemIndex].attributes;
 
-          setSearchQuery(firstName + ' ' + lastName);
+          setSearchQuery(name);
           setDropdownIsOpen(false);
         }
 
@@ -134,16 +137,13 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const searchFilter = (item: Employee) => {
     // test if string has search query, case insensitive
     const regexp = new RegExp(searchQuery, 'i');
+    const { name: fullName } = item.attributes;
 
     // tests against e.g. "JaneDoe"
-    const variant1 = regexp.test(
-      item.attributes.firstName + item.attributes.lastName
-    );
+    const variant1 = regexp.test(fullName.split(' ').join(''));
 
     // tests against e.g. "Jane Doe"
-    const variant2 = regexp.test(
-      item.attributes.firstName + ' ' + item.attributes.lastName
-    );
+    const variant2 = regexp.test(fullName);
 
     return variant1 || variant2;
   };
@@ -163,52 +163,39 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
       />
 
       {dropdownIsOpen && !loading && data.filter(searchFilter).length > 0 && (
-        <ul
-          className={styles.dropdownList}
-          role="listbox"
-          tabIndex={0}
-          ref={ulRef}
-          aria-label="Manager search listbox"
-          onKeyDown={handleKeyDown}
-        >
+        <ListBox ulRef={ulRef} keyDownHandler={handleKeyDown}>
           {data
             .filter(searchFilter)
-            .map(({ id, attributes, email, rgbColorArray }, index) => {
-              return (
-                <li
-                  className={styles.listItem}
-                  id={`option-${id}`}
-                  key={id}
-                  role="option"
-                  tabIndex={-1}
-                  onClick={() =>
-                    handleOptionSelect(
-                      index,
-                      attributes.firstName + ' ' + attributes.lastName
-                    )
-                  }
-                  aria-selected={selectedItemIndex === index}
-                  aria-label={attributes.firstName + ' ' + attributes.lastName}
-                >
-                  <Avatar
-                    src={attributes.avatar}
-                    altText={`${attributes.firstName} ${attributes.lastName} avatar image`}
-                    rgbColorArray={rgbColorArray}
-                    initials={
-                      attributes.firstName.charAt(0) +
-                      attributes.lastName.charAt(0)
-                    }
-                  />
-                  <div>
-                    <strong className={styles.name} data-testid="full-name">
-                      {attributes.firstName} {attributes.lastName}
-                    </strong>
-                    {email}
-                  </div>
-                </li>
-              );
-            })}
-        </ul>
+            .map(
+              (
+                {
+                  id,
+                  attributes: { name, firstName, lastName, avatar },
+                  email,
+                  rgbColorArray,
+                },
+                index
+              ) => {
+                return (
+                  <Option
+                    id={`option-${id}`}
+                    key={id}
+                    clickHandler={() => handleOptionSelect(index, name)}
+                    isSelected={selectedItemIndex === index}
+                    label={name}
+                    secondaryText={email}
+                  >
+                    <Avatar
+                      src={avatar}
+                      altText={`${name} avatar image`}
+                      rgbColorArray={rgbColorArray}
+                      initials={firstName.charAt(0) + lastName.charAt(0)}
+                    />
+                  </Option>
+                );
+              }
+            )}
+        </ListBox>
       )}
     </div>
   );
