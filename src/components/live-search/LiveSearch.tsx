@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import useClickOutside from '../../hooks/useClickOutside';
 import useFetchData from '../../hooks/useFetchData';
+import { Employee } from '../../interfaces/interfaces';
 import { Avatar } from '../avatar';
 import styles from './LiveSearch.module.css';
 
@@ -134,6 +135,23 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
     }
   }, [ulRef, selectedItemIndex, dropdownIsOpen]);
 
+  const searchFilter = (item: Employee) => {
+    // test if string has search query, case insensitive
+    const regexp = new RegExp(searchQuery, 'i');
+
+    // tests against e.g. "JaneDoe"
+    const variant1 = regexp.test(
+      item.attributes.firstName + item.attributes.lastName
+    );
+
+    // tests against e.g. "Jane Doe"
+    const variant2 = regexp.test(
+      item.attributes.firstName + ' ' + item.attributes.lastName
+    );
+
+    return variant1 || variant2;
+  };
+
   return (
     <div className={styles.container} ref={wrapperRef}>
       <input
@@ -159,22 +177,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
           onKeyDown={handleKeyDown}
         >
           {data
-            .filter((item) => {
-              // test if string has search query, case insensitive
-              const regexp = new RegExp(searchQuery, 'i');
-
-              // tests against e.g. "JaneDoe"
-              const variant1 = regexp.test(
-                item.attributes.firstName + item.attributes.lastName
-              );
-
-              // tests against e.g. "Jane Doe"
-              const variant2 = regexp.test(
-                item.attributes.firstName + ' ' + item.attributes.lastName
-              );
-
-              return variant1 || variant2;
-            })
+            .filter(searchFilter)
             .map(({ id, attributes, email, rgbColorArray }, index) => {
               return (
                 <li
