@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import useClickOutside from '../../hooks/useClickOutside';
-import { Employee, Relationship } from '../../interfaces/interfaces';
-import { API_URL } from '../../urls';
-import generateRandomRgbValueArray from '../../util/random-rgb';
+import useFetchData from '../../hooks/useFetchData';
 import { Avatar } from '../avatar';
 import styles from './LiveSearch.module.css';
 
@@ -12,7 +10,6 @@ interface LiveSearchProps {
 
 /**
  * @TODO
- * - abstract fetching to outside component
  * - add arrow to input to indicate it's a dropdown
  * - split into components
  * - aria roles: listbox > option: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
@@ -39,10 +36,8 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error>();
-  const [data, setData] = useState<Employee[]>([]);
   const ulRef = useRef<HTMLUListElement>(null);
+  const { loading, data, error } = useFetchData();
   const {
     elRef: wrapperRef,
     visible: dropdownIsOpen,
@@ -143,40 +138,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
       itemAtIndex.focus();
     }
   };
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoading(true);
-
-      try {
-        const res = await fetch(API_URL);
-        const json = await res.json();
-
-        setData(
-          json.data.map((item: Employee) => {
-            const relationship = json.included.find((i: Relationship) => {
-              return i.id === item.relationships.account.data.id;
-            });
-            const email = relationship.attributes.email;
-
-            return {
-              ...item,
-              email,
-              rgbColorArray: generateRandomRgbValueArray(),
-            };
-          })
-        );
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
 
   useEffect(() => {
     if (dropdownIsOpen && selectedItemIndex !== null) {
