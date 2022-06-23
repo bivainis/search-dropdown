@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import useClickOutside from '../../hooks/click-outside';
+import { Employee, Relationship } from '../../interfaces/interfaces';
 import { API_URL } from '../../urls';
 import generateRandomRgbValueArray from '../../util/random-rgb';
 import { Avatar } from '../avatar';
@@ -9,37 +10,9 @@ interface LiveSearchProps {
   id: string;
 }
 
-interface Employee {
-  id: number;
-  attributes: {
-    avatar: string;
-    firstName: string;
-    lastName: string;
-  };
-  email: string;
-  rgbColorArray: [number, number, number];
-  relationships: {
-    account: {
-      data: {
-        id: number;
-      };
-    };
-  };
-}
-
-interface Relationship {
-  type: string;
-  id: number;
-  attributes: {
-    email: string;
-  };
-}
-
 /**
  * @TODO
- * - tests
- * - test utils
- * - abstract fetching to a hook
+ * - abstract fetching to outside component
  * - add arrow to input to indicate it's a dropdown
  * - split into components
  * - aria roles: listbox > option: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
