@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import useClickOutside from '../../hooks/click-outside';
 import { API_URL } from '../../urls';
 import generateRandomRgbValueArray from '../../util/random-rgb';
 import { Avatar } from '../avatar';
@@ -62,7 +63,6 @@ interface Relationship {
  */
 const LiveSearch = ({ id }: LiveSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null
   );
@@ -70,7 +70,11 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const [error, setError] = useState<Error>();
   const [data, setData] = useState<Employee[]>([]);
   const ulRef = useRef<HTMLUListElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const {
+    elRef: wrapperRef,
+    visible: dropdownIsOpen,
+    setVisible: setDropdownIsOpen,
+  } = useClickOutside(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // @TODO: debounce
@@ -206,24 +210,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
       focusListItem(ulRef, selectedItemIndex);
     }
   }, [ulRef, selectedItemIndex, dropdownIsOpen]);
-
-  useEffect(() => {
-    const handleWindowClick = (e: MouseEvent) => {
-      if (!wrapperRef.current?.contains(e.target as HTMLElement)) {
-        setDropdownIsOpen(false);
-      }
-    };
-
-    if (dropdownIsOpen) {
-      window.addEventListener('click', handleWindowClick);
-    } else {
-      window.removeEventListener('click', handleWindowClick);
-    }
-
-    return () => {
-      window.removeEventListener('click', handleWindowClick);
-    };
-  }, [wrapperRef, dropdownIsOpen]);
 
   return (
     <div className={styles.container} ref={wrapperRef}>
