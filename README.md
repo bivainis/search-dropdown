@@ -1,46 +1,64 @@
-# Getting Started with Create React App
+# Prerequisites
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- make sure you're using Node v16 w/ NPM 8
+- paste the api URL into `.env` file, e.g. `REACT_APP_API_URL=https://...`(covers both dev and test envs, but please don't accidentally commit)
 
-## Available Scripts
+# How to
 
-In the project directory, you can run:
+## Start dev server
 
-### `npm start`
+(make sure env variable is set before starting the app)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. `npm start`
+2. Visit http://localhost:3000 if it doesn't automatically open
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Run tests
 
-### `npm test`
+`npm test`  
+**Note**: you might need to hit `a` key to run all tests.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ADR
 
-### `npm run build`
+### Data filtering
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Looks like everyone is a list is a manager, so we don't need to filter the results by manager role.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Debounce, lazy-loading, pagination
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+There are only 9 results returned from the api. Therefore pagination together with lazy-loading could be addressed once the api grows. Although it would be nice to add some debouncing so we don't filter on each keystroke immediately, and instead wait half a second or so after the last keystroke to trigger filtering.
 
-### `npm run eject`
+### Data
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+#### Emails
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+It looks like email addresses will need to be mapped to user data after fetching, and looks like it can be done based on account id.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+#### Avatars
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+There is an avatar key in the returned data, but all employees have it as `null`. It looks from the design that we can set the placeholder avatar to their initials in this case.
 
-## Learn More
+While it would be cool to do something like this for the initials: `attributes.name.match(/[A-Z]/g).join('')` (or another fancy expression), it will be safer to use charAt(0) for name/surname combo, especially due to non-ASCII letters.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Would be nice to assign a random color to avatar initials, since color is not coming from the API.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Will assign a random color during data mapping, so the colors don't change on rerender when typing search query if assigned in the component.
+
+### Filtering
+
+Since we need to search ignoring the space between first and last names, filtering could be done either by combining firstName + lastName and testing againts a regexp, or tested on the name field by ignoring the space.
+
+### Dropdown list
+
+Because we want the dropdown to represent a role closer to select than a list, listbox and option roles might be used.
+
+Controling list height would ideally be done by calculating the height of one list item and cap the height accordingly, however initially we'll limit it by fixed element height until it can be refactored.
+
+In addition, adding some extra max-height, to indicate to the users there are more items in the list that they can scroll to.
+
+### Keyboard navigation
+
+Following best practice guide from here: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role#required_javascript_features
+
+### Tests and mocking
+
+We'll use `msq` (mock service worker) to mock data in tests. Mock data response will match the real response structure, except with the most sensitive data removed.
