@@ -42,6 +42,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   const handleInputFocus = (
     e: React.FocusEvent<HTMLInputElement | HTMLUListElement>
   ) => {
+    setSelectedItemIndex(null);
     setDropdownIsOpen(true);
   };
 
@@ -67,7 +68,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
             return 0;
           }
 
-          if (prev < data.length) {
+          if (prev < data.filter(searchFilter).length) {
             return prev + 1;
           }
 
@@ -90,7 +91,8 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         break;
       case 'Enter':
         if (selectedItemIndex !== null) {
-          const { firstName, lastName } = data[selectedItemIndex].attributes;
+          const { firstName, lastName } =
+            data.filter(searchFilter)[selectedItemIndex].attributes;
 
           setSearchQuery(firstName + ' ' + lastName);
           setDropdownIsOpen(false);
@@ -160,14 +162,13 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         onKeyDown={handleKeyDown}
       />
 
-      {dropdownIsOpen && !loading && data.length > 0 && (
+      {dropdownIsOpen && !loading && data.filter(searchFilter).length > 0 && (
         <ul
           className={styles.dropdownList}
           role="listbox"
           tabIndex={0}
           ref={ulRef}
           aria-label="Manager search listbox"
-          aria-activedescendant={`option-${selectedItemIndex || 0}`}
           onKeyDown={handleKeyDown}
         >
           {data
@@ -176,7 +177,7 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
               return (
                 <li
                   className={styles.listItem}
-                  id={`option-${index}`}
+                  id={`option-${id}`}
                   key={id}
                   role="option"
                   tabIndex={-1}

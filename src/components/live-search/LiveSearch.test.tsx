@@ -206,8 +206,24 @@ test('enter key should set input value and close the dropdown', async () => {
   expect(list).not.toBeInTheDocument();
 });
 
+test('arrow navigation works on filtered list', async () => {
+  const input = focusInput('textbox');
+  await screen.findByRole('listbox');
+
+  userEvent.type(input, 'har');
+
+  userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+  expect(input).toHaveValue('Harriet Banks');
+
+  userEvent.clear(input);
+  userEvent.type(input, 'ma');
+  userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{Enter}');
+
+  expect(input).toHaveValue('Marguerite Ryan');
+});
+
 // @TODO:
-xtest('arrow navigation works on filtered list', () => {});
 xtest('when input is focused, Tab should focus the first item in the list', () => {});
 xtest('when first item is focused, ArrowUp should focus back on input', () => {});
 xtest('empty state is shown if nothing matches search query', () => {});
