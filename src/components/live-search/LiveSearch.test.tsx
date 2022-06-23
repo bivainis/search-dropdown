@@ -11,16 +11,25 @@ afterEach(() => {
   cleanup();
 });
 
+// gets and focuses input
+const focusInput = (role: string) => {
+  const inputElement = screen.getByRole(role);
+  userEvent.click(inputElement);
+
+  return inputElement;
+};
+
+const getItems = (list: HTMLElement, role: string) => {
+  const { getAllByRole } = within(list);
+  return getAllByRole(role);
+};
+
 test('Renders select component without errors.', () => {
   expect(screen.getByRole('textbox')).toBeInTheDocument();
 });
 
 test('User can focus on the input field', () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
-
-  expect(inputElement).toHaveFocus();
+  expect(focusInput('textbox')).toHaveFocus();
 });
 
 test('Dropdown is hidden on initial render', () => {
@@ -30,9 +39,7 @@ test('Dropdown is hidden on initial render', () => {
 });
 
 test('When user clicks into the input field, he/she sees the full list of managers.', async () => {
-  const inputElement = screen.getByRole('textbox', { name: 'Manager search' });
-
-  userEvent.click(inputElement);
+  focusInput('textbox');
 
   const list = await screen.findByRole('listbox');
 
@@ -45,10 +52,7 @@ test('When user clicks into the input field, he/she sees the full list of manage
 });
 
 test('filter dropdown based on a query', async () => {
-  const inputElement = screen.getByRole('textbox', { name: 'Manager search' });
-
-  // focus and type in the query
-  const searchQueries = ['Harr', 'harr', 'arr'];
+  const inputElement = screen.getByRole('textbox');
 
   const scenarios = {
     firstName: {
@@ -97,12 +101,9 @@ test('filter dropdown based on a query', async () => {
 test('preserve query on input focus loss', async () => {
   render(<ClickOutside />);
 
-  const inputElement = screen.getByRole('textbox');
+  const inputElement = focusInput('textbox');
+
   const clickOutsideElement = screen.getByTestId('click-outside');
-
-  userEvent.click(inputElement);
-
-  expect(inputElement).toHaveFocus();
 
   userEvent.type(inputElement, 'harr');
   userEvent.click(clickOutsideElement);
@@ -124,14 +125,10 @@ test('preserve query on input focus loss', async () => {
 test('dropdown is closed when clicking outside', async () => {
   render(<ClickOutside />);
 
-  const inputElement = screen.getByRole('textbox');
+  focusInput('textbox');
+
   const clickOutsideElement = screen.getByTestId('click-outside');
-
-  userEvent.click(inputElement);
-  expect(inputElement).toHaveFocus();
-
   const list = await screen.findByRole('listbox');
-  expect(list).toBeInTheDocument();
 
   userEvent.click(clickOutsideElement);
 
@@ -139,14 +136,10 @@ test('dropdown is closed when clicking outside', async () => {
 });
 
 test('dropdown is hidden after selecting an option', async () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
+  focusInput('textbox');
 
   const list = await screen.findByRole('listbox');
-
-  const { getAllByRole } = within(list);
-  const items = getAllByRole('option');
+  const items = getItems(list, 'option');
 
   userEvent.click(items[1]);
 
@@ -154,71 +147,55 @@ test('dropdown is hidden after selecting an option', async () => {
 });
 
 test('when input is focused, ArrowDown should focus the first item in the list', async () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
+  focusInput('textbox');
 
   const list = await screen.findByRole('listbox');
+  const firstItem = getItems(list, 'option')[0];
 
   userEvent.keyboard('{ArrowDown}');
 
-  const { getAllByRole } = within(list);
-  const items = getAllByRole('option');
-
-  expect(items[0]).toHaveAttribute('aria-selected', 'true');
+  expect(firstItem).toHaveAttribute('aria-selected', 'true');
 });
 
 test('when first item is focused, ArrowDown should focus the next item in the list', async () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
+  focusInput('textbox');
 
   const list = await screen.findByRole('listbox');
+  const secondItem = getItems(list, 'option')[1];
 
   userEvent.keyboard('{ArrowDown}{ArrowDown}');
 
-  const { getAllByRole } = within(list);
-  const items = getAllByRole('option');
-
-  expect(items[1]).toHaveAttribute('aria-selected', 'true');
-  expect(items[1]).toHaveFocus();
+  expect(secondItem).toHaveAttribute('aria-selected', 'true');
+  expect(secondItem).toHaveFocus();
 });
 
 test('clicking on an option should fill the full name in the input and hide the list', async () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
-
+  const input = focusInput('textbox');
   const list = await screen.findByRole('listbox');
-  const { getAllByRole } = within(list);
-  const items = getAllByRole('option');
+  const thirdItem = getItems(list, 'option')[2];
 
-  userEvent.click(items[2]);
+  userEvent.click(thirdItem);
 
-  expect(inputElement).toHaveValue('Mathilda Summers');
+  expect(input).toHaveValue('Mathilda Summers');
 });
 
 test('esc key should clear the input', () => {
-  const inputElement = screen.getByRole('textbox');
+  const input = focusInput('textbox');
 
-  userEvent.type(inputElement, 'Hello');
-
+  userEvent.type(input, 'Hello');
   userEvent.keyboard('{Escape}');
 
-  expect(inputElement).not.toHaveValue();
+  expect(input).not.toHaveValue();
 });
 
 test('enter key should set input value and close the dropdown', async () => {
-  const inputElement = screen.getByRole('textbox');
-
-  userEvent.click(inputElement);
-
+  const input = focusInput('textbox');
   const list = await screen.findByRole('listbox');
 
   userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
-  expect(inputElement).toHaveValue('Harriet Banks');
-  expect(inputElement).not.toHaveFocus();
+  expect(input).toHaveValue('Harriet Banks');
+  expect(input).not.toHaveFocus();
   expect(list).not.toBeInTheDocument();
 });
 
