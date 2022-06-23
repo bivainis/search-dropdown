@@ -1,7 +1,12 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import setupMockServer from '../../mocks/mock-service-worker-server';
 import ClickOutside from '../../helpers/test-helpers';
 import LiveSearch from './LiveSearch';
+
+const server = setupMockServer;
+
+beforeAll(() => server.listen());
 
 beforeEach(() => {
   render(<LiveSearch id="manager-search" />);
@@ -10,6 +15,8 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
 });
+
+afterAll(() => server.close());
 
 // gets and focuses input
 const focusInput = (role: string) => {
@@ -33,9 +40,9 @@ test('User can focus on the input field', () => {
 });
 
 test('Dropdown is hidden on initial render', () => {
-  const dropdownElementOrNull = screen.queryByRole('listbox');
+  const list = screen.queryByRole('listbox');
 
-  expect(dropdownElementOrNull).not.toBeInTheDocument();
+  expect(list).not.toBeInTheDocument();
 });
 
 test('When user clicks into the input field, he/she sees the full list of managers.', async () => {

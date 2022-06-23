@@ -57,3 +57,7 @@ In addition, adding some extra max-height, to indicate to the users there are mo
 ### Keyboard navigation
 
 Following best practice guide from here: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role#required_javascript_features
+
+### Tests and mocking
+
+We'll use `msq` (mock service worker) to mock data in tests. Mock data response will match the real response structure, except with the most sensitive data removed.
