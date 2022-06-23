@@ -14,7 +14,8 @@
 
 ## Run tests
 
-`npm test`
+`npm test`  
+**Note**: you might need to hit `a` key to run all tests.
 
 ## ADR
 
