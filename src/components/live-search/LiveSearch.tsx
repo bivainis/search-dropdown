@@ -10,26 +10,16 @@ interface LiveSearchProps {
 
 /**
  * @TODO
- * - add arrow to input to indicate it's a dropdown
- * - split into components
- * - aria roles: listbox > option: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
- * - esc should clear the field
- * - keyboard navigation
+ * - add arrow to input to indicate it's a dropdown, rotate on open
+ * - split into list/item components
+ * - ul component should accept options from parent instead of data fetching
  * - empty state on empty data or empty search results
- * - loading and error states
- * - ul component should accept data
- * - debounce
- * - styling
- * - documentation and sources
- * - lock node version
- * - api url env variable
+ * - (maybe) lock node version
+ * - (maybe) debounce filtering on typing
  * - (maybe) abstract css values to css variables, add scss
  * - (maybe) cache results and compare when rendering
  * - (maybe) look into suspense
- * - (maybe) paginate
  * - (maybe) storybook
- * - (maybe) animations
- * - (maybe) add params on how much to fetch
  */
 const LiveSearch = ({ id }: LiveSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,7 +35,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
   } = useClickOutside(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // @TODO: debounce
     setSearchQuery(e.target.value);
   };
 
@@ -173,9 +162,13 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
             .filter((item) => {
               // test if string has search query, case insensitive
               const regexp = new RegExp(searchQuery, 'i');
+
+              // tests against e.g. "JaneDoe"
               const variant1 = regexp.test(
                 item.attributes.firstName + item.attributes.lastName
               );
+
+              // tests against e.g. "Jane Doe"
               const variant2 = regexp.test(
                 item.attributes.firstName + ' ' + item.attributes.lastName
               );
