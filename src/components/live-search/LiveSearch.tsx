@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import useClickOutside from '../../hooks/click-outside';
+import useClickOutside from '../../hooks/useClickOutside';
 import { Employee, Relationship } from '../../interfaces/interfaces';
 import { API_URL } from '../../urls';
 import generateRandomRgbValueArray from '../../util/random-rgb';
