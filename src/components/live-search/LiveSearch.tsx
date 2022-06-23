@@ -45,15 +45,11 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
     setDropdownIsOpen(true);
   };
 
+  // @TODO: refactor
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLUListElement>
   ) => {
     switch (e.key) {
-      case 'Tab':
-        setSelectedItemIndex(0);
-
-        break;
-
       case 'ArrowDown':
         /**
          * preventDefault fixes an issue where the first item is
@@ -92,7 +88,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         });
 
         break;
-
       case 'Enter':
         if (selectedItemIndex !== null) {
           const { firstName, lastName } = data[selectedItemIndex].attributes;
@@ -102,7 +97,6 @@ const LiveSearch = ({ id }: LiveSearchProps) => {
         }
 
         break;
-
       case 'Escape':
         setSearchQuery('');
         break;
